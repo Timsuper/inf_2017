@@ -1,0 +1,301 @@
+unit Haupt;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Graphics, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.TabControl,
+  FMX.StdCtrls, FMX.Gestures, FMX.Controls.Presentation, FMX.Ani, FMX.Objects,
+  FMX.Edit, FMX.Effects, FMX.ScrollBox, FMX.Memo, FMX.Layouts,
+  FMX.WebBrowser, IdHTTP, Common, IdBaseComponent, IdComponent, IdTCPConnection,
+  IdTCPClient;
+
+type
+  THauptForm = class(TForm)
+    GestureManager1: TGestureManager;
+    ToolBar1: TToolBar;
+    Label1: TLabel;
+    ShadowEffect2: TShadowEffect;
+    ColorAnimationRedBar: TColorAnimation;
+    N5CImage: TImage;
+    ShadowEffect1: TShadowEffect;
+    ColorAnimationGreenBar: TColorAnimation;
+    panel_login: TPanel;
+    background: TImage;
+    button_login: TButton;
+    button_register: TButton;
+    edit_username: TEdit;
+    edit_password: TEdit;
+    lable_username: TLabel;
+    label_password: TLabel;
+    login_slide_down: TFloatAnimation;
+    login_slide_up: TFloatAnimation;
+    image_loading_background: TImage;
+    AlphaAnimation: TFloatAnimation;
+    AlphaAnimation_hide: TFloatAnimation;
+    image_loading: TImage;
+    LoadingAnimation_spin: TFloatAnimation;
+    LoadingAnimation_opacity: TFloatAnimation;
+    LoadingAnimation_opacity_hide: TFloatAnimation;
+    TabControl1: TTabControl;
+    TabItem1: TTabItem;
+    chat_browser: TWebBrowser;
+    TabItem2: TTabItem;
+    TabItem3: TTabItem;
+    TabItem4: TTabItem;
+    button_logout: TButton;
+    StyleBook1: TStyleBook;
+    Timer_after_login_animation_hide: TTimer;
+    Panel1: TPanel;
+    Edit1: TEdit;
+    SpeedButton1: TSpeedButton;
+    Panel2: TPanel;
+    IdHTTP1: TIdHTTP;
+    VertScrollBox1: TVertScrollBox;
+    app_key_label: TLabel;
+    procedure FormCreate(Sender: TObject);
+    procedure FormGesture(Sender: TObject; const EventInfo: TGestureEventInfo;
+      var Handled: Boolean);
+    procedure button_registerClick(Sender: TObject);
+    procedure show_loding;
+    procedure hide_loding(after:boolean=false);
+    procedure show_login;
+    procedure hide_login;
+    procedure button_loginClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure login_slide_downFinish(Sender: TObject);
+    procedure login_slide_upFinish(Sender: TObject);
+    procedure button_logoutClick(Sender: TObject);
+    procedure sudoku_set_value_of_all(str:string);
+    procedure sudoku_set_value_of_cell(i,k:integer;str:string);
+    procedure sudokuClick(Sender: TObject);
+    procedure TabControl1Change(Sender: TObject);
+    procedure TabControl1ApplyStyleLookup(Sender: TObject);
+    procedure VertScrollBox1ApplyStyleLookup(Sender: TObject);
+    procedure IdHTTP1Redirect(Sender: TObject; var dest: string;
+      var NumRedirect: Integer; var Handled: Boolean; var VMethod: string);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    function sendPOST(url:string; field:string='false'): string;
+  end;
+
+var
+  HauptForm: THauptForm;
+  Common: TCommon;
+  screen_height,screen_width: integer;
+
+implementation
+
+{$R *.fmx}
+
+function THauptForm.sendPOST(url:string; field:string='false'):string;
+var
+  lParamList: TStringList;
+  r: string;
+begin
+  lParamList := TStringList.Create;
+  lParamList.Add('app_login=get_key');
+
+  HauptForm.IdHTTP1 := TIdHTTP.Create(nil);
+  try
+    try
+      r := HauptForm.IdHTTP1.Post(url, lParamList);
+      ShowMessage('Seite meldet: '+r);
+    except
+      on E: Exception do
+        begin
+//          r := 'false';
+//          ShowMessage('Fehler: ' + E.Message);
+//          ShowMessage(IdHTTP1.Response.Location);
+        end;
+    end;
+  finally
+    HauptForm.IdHTTP1.Free;
+    lParamList.Free;
+    result := r;
+  end;
+end;
+
+procedure THauptForm.show_loding;
+begin
+  image_loading_background.Visible:=true;
+  image_loading_background.Opacity:=0;
+  AlphaAnimation.Start;
+  image_loading.Visible:=true;
+  image_loading.Opacity:=0;
+  LoadingAnimation_opacity.Start;
+  LoadingAnimation_spin.Start;
+end;
+
+procedure THauptForm.hide_loding(after: boolean=false);
+begin
+  AlphaAnimation_hide.Start;
+  LoadingAnimation_opacity_hide.Start;
+  LoadingAnimation_spin.Stop;
+  image_loading.Visible:=false;
+  image_loading_background.Visible:=false;
+  if after=true then
+    ColorAnimationGreenBar.Start;
+end;
+
+procedure THauptForm.TabControl1ApplyStyleLookup(Sender: TObject);
+begin
+  if (TabItem1.IsSelected) then
+  begin
+    chat_browser.Visible:=true;
+  end;
+  if (TabItem1.IsSelected=false) then
+  begin
+    chat_browser.Visible:=false;
+  end;
+end;
+
+procedure THauptForm.TabControl1Change(Sender: TObject);
+begin
+  if (panel_login.Visible = false) then
+  begin
+    if (TabItem1.IsSelected) then
+    begin
+      chat_browser.Visible:=true;
+    end;
+    if (TabItem1.IsSelected=false) then
+    begin
+      chat_browser.Visible:=false;
+    end;
+  end;
+end;
+
+procedure THauptForm.VertScrollBox1ApplyStyleLookup(Sender: TObject);
+begin
+  VertScrollBox1.Width:=screen_width;
+  VertScrollBox1.Height:=screen_height;
+end;
+
+procedure THauptForm.show_login;
+begin
+  panel_login.Visible:=true;
+  chat_browser.Visible:=false;
+  login_slide_up.StartValue:=screen_height+1;
+  login_slide_up.Start;
+end;
+
+procedure THauptForm.hide_login;
+begin
+  login_slide_down.StopValue:=screen_height+1;
+  panel_login.Align:=TAlignLayout.None;
+  login_slide_down.Start;
+end;
+
+procedure THauptForm.IdHTTP1Redirect(Sender: TObject; var dest: string;
+  var NumRedirect: Integer; var Handled: Boolean; var VMethod: string);
+begin
+  Handled:=true;
+  ShowMessage('Loc: '+dest);
+end;
+
+procedure THauptForm.login_slide_downFinish(Sender: TObject);
+begin
+  panel_login.Visible:=false;
+end;
+
+procedure THauptForm.login_slide_upFinish(Sender: TObject);
+begin
+  panel_login.Align:=TAlignLayout.Client;
+end;
+
+procedure THauptForm.sudoku_set_value_of_all(str:string);
+var
+  i: Integer;
+  k: Integer;
+begin
+  for i := 1 to 9 do
+  begin
+    for k := 1 to 9 do
+    begin
+        TLabel(HauptForm.FindComponent('field_'+IntToStr(i)+'_'+IntToStr(k))).Text := str;
+    end;
+  end;
+end;
+
+procedure THauptForm.sudoku_set_value_of_cell(i,k:integer;str:string);
+begin
+  TLabel(HauptForm.FindComponent('field_'+IntToStr(i)+'_'+IntToStr(k))).Text := str;
+end;
+
+procedure THauptForm.button_loginClick(Sender: TObject);
+var
+  app_key: string;
+begin
+  HauptForm.show_loding;
+  app_key:=HauptForm.sendPOST('http://www.number5company.de/core/login.php');
+  app_key_label.Text:=app_key;
+  if app_key <> 'false' then
+  begin
+    HauptForm.hide_loding(true);
+    HauptForm.hide_login;
+    ShowMessage('Login. App-Key: '+app_key);
+  end
+  else
+  begin
+    ShowMessage('Fehlerhafter Login. App-Key: '+app_key);
+    HauptForm.hide_loding(false);
+  end;
+end;
+
+procedure THauptForm.button_logoutClick(Sender: TObject);
+begin
+  HauptForm.show_login;
+end;
+
+procedure THauptForm.button_registerClick(Sender: TObject);
+begin
+  Common.open_browser_url('http://www.number5company.de/register/');
+end;
+
+procedure THauptForm.FormActivate(Sender: TObject);
+begin
+  screen_width:=Screen.Size.Width;
+  screen_height:=Screen.Size.Height;
+end;
+
+procedure THauptForm.sudokuClick(Sender: TObject);
+var
+  label_comp: TLabel;
+begin
+  label_comp := Sender as TLabel;
+  ShowMessage(label_comp.Name);
+
+end;
+
+procedure THauptForm.FormCreate(Sender: TObject);
+begin
+  { This defines the default active tab at runtime }
+  TabControl1.ActiveTab := TabItem4;
+  show_login;
+end;
+
+procedure THauptForm.FormGesture(Sender: TObject;
+  const EventInfo: TGestureEventInfo; var Handled: Boolean);
+begin
+{$IFDEF ANDROID}
+  case EventInfo.GestureID of
+    sgiLeft:
+    begin
+      if TabControl1.ActiveTab <> TabControl1.Tabs[TabControl1.TabCount-1] then
+        TabControl1.ActiveTab := TabControl1.Tabs[TabControl1.TabIndex+1];
+      Handled := True;
+    end;
+
+    sgiRight:
+    begin
+      if TabControl1.ActiveTab <> TabControl1.Tabs[0] then
+        TabControl1.ActiveTab := TabControl1.Tabs[TabControl1.TabIndex-1];
+      Handled := True;
+    end;
+  end;
+{$ENDIF}
+end;
+
+end.

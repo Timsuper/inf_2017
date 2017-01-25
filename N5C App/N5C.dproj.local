@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<ActiveMobileDevice>
+		<NoProfile Android="TA8830J6SD"/>
+	</ActiveMobileDevice>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.682,C:\Users\Timka\Documents\N5C App\Haupt.pas=C:\Users\Timka\Documents\N5C App\TabbedTemplate.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.150,C:\Users\Timka\Documents\N5C App\Common.pas=C:\Users\Timka\Documents\N5C App\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.487,C:\Users\Timka\Documents\N5C App\N5C.dproj=C:\Users\Timka\Documents\N5C App\TabbedApplication.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.682,C:\Users\Timka\Documents\N5C App\Haupt.fmx=C:\Users\Timka\Documents\N5C App\TabbedTemplate.fmx</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.480,=C:\Users\Timka\Documents\N5C App\Unit1.pas</Transaction>
+  </Transactions>
+</BorlandProject>

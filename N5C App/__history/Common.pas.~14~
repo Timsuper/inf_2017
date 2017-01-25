@@ -1,0 +1,67 @@
+unit Common;
+
+interface
+
+uses
+  Classes, SysUtils, FMX.Forms, IdURI, FMX.Objects, FMX.Dialogs, FMX.Platform,
+  System.IOUtils, FMX.Controls, FMX.StdCtrls, androidapi.JNI.GraphicsContentViewText,
+  Androidapi.Helpers, Androidapi.JNI.Net, Androidapi.JNI.JavaTypes, Androidapi.JNI.Webkit, IdHTTP;
+
+type
+  TCommon = class
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure open_browser_url(url:string; const DisplayError: Boolean = False);
+    function sendPOST(url:string='http://www.number5company.de/login.php'; field:string='false'): string;
+  end;
+
+var
+  CommonVar: TCommon;
+
+implementation
+
+uses Haupt;
+
+var HauptFormCommon: THauptForm;
+
+procedure TCommon.open_browser_url(url:string; const DisplayError: Boolean = False);
+var
+  Intent: JIntent;
+begin
+  Intent := TJIntent.JavaClass.init(TJIntent.JavaClass.ACTION_VIEW,
+    TJnet_Uri.JavaClass.parse(StringToJString(TIdURI.URLEncode(URL))));
+  try
+    SharedActivity.startActivity(Intent);
+    exit();
+  except
+    on e: Exception do
+    begin
+      if DisplayError then ShowMessage('Error: ' + e.Message);
+      exit();
+    end;
+  end;
+end;
+
+function TCommon.sendPOST(url:string='http://www.number5company.de/login.php'; field:string='false'):string;
+var
+  lParamList: TStringList;
+begin
+  lParamList := TStringList.Create;
+  lParamList.Add('app_login=get_key');
+
+  HauptFormCommon.IdHTTP1 := TIdHTTP.Create(nil);
+  try
+    try
+      Result := HauptFormCommon.IdHTTP1.Post('http://www.number5company.de/login.php', lParamList);
+      except
+      Result := 'false';
+    end;
+  finally
+    HauptFormCommon.IdHTTP1.Free;
+    lParamList.Free;
+  end;
+end;
+
+end.

@@ -1,0 +1,14 @@
+program TabbedApplication;
+
+uses
+  System.StartUpCopy,
+  FMX.Forms,
+  TabbedTemplate in 'TabbedTemplate.pas' {HauptForm};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(THauptForm, HauptForm);
+  Application.Run;
+end.
